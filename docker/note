@@ -1,0 +1,35 @@
+# Build an docker image
+nvidia-docker build --tag votegraspv2 ./
+
+# Tag and push to docker
+docker tag votegraspv2 hoangcuongbk80/votegraspv2
+docker push hoangcuongbk80/votegraspv2
+
+# create a container
+nvidia-docker run --name my_votegrasp -it --rm -v /home/cghg/votegraspv2/:/votegraspv2 -v /media/DiskStation/trsv/data/graspnet:/graspnet --ipc=host hoangcuongbk80/votegraspv2 /bin/bash
+
+------------------------------install-------------------------------
+# votegrasp
+cd pointnet2
+python setup.py install
+
+# graspnetAPI
+cd graspnetAPI
+pip install .
+
+# graspnet-baseline
+cd graspnet-baseline
+cd pointnet2
+python setup.py install
+cd knn
+python setup.py install
+
+
+------------------------------VoteGrasp-------------------------------
+python train.py --dataset ycbgrasp --log_dir log_ycbgrasp
+python predict.py
+
+------------------------------graspnet-baseline-------------------------------
+# only for demo, not for training because of lack of tensorboard 2.3
+cd graspnet-baseline
+sh command_demo.sh

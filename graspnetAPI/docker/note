@@ -1,0 +1,14 @@
+# Build an docker image
+nvidia-docker build --tag graspnet ./
+
+# create a container
+nvidia-docker run --name my_graspnet -it --rm -v /home/cghg/graspnetAPI/:/graspnetAPI -v /media/DiskStation/trsv/data/graspnet:/graspnet --ipc=host graspnet /bin/bash
+
+cd graspnetAPI
+pip install .
+
+cd graspnet-baseline
+cd pointnet2
+python setup.py install
+cd knn
+python setup.py install

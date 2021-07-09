@@ -1,0 +1,105 @@
+# Data files and directories common
+ycbgrasp/data/
+ycbgrasp/data_viz_dump
+demo_files/
+log_ycbgrasp/
+log/
+pred_result/
+pointnet2/build/
+pointnet2/pointnet2.egg-info/
+pointnet2/dist/
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Distribution / packaging
+.Python
+env/
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# VS Studio Code
+# Data files and directories common
+#ycbgrasp/data/
+ycbgrasp/data_viz_dump
+demo_files/
+log_ycbgrasp/
+log/
+pred_result/
+pointnet2/build/
+pointnet2/pointnet2.egg-info/
+pointnet2/dist/
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Distribution / packaging
+.Python
+env/
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# VS Studio Code
+.vscode
+
+# PyCharm
+.idea/
+
+# Dropbox
+.dropbox.attr
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# pyenv
+.python-version
+
+# dotenv
+.env
+
+# virtualenv
+.venv
+venv/
+ENV/
+
+# GraspAPI
+*.pyc
+*.so
+*.o
+*.egg-info/
+/graspnetAPI/dump_full/
+/graspnetAPI/eval/acc_novel
+/dump_full/
+/dist/
+/build/
+/.vscode/
+/graspnms/build/
+*.npy
+/graspnms/grasp_nms.cpp
+
+# graspnet-baseline
+**/__pycache__/**
+*.ipynb
+**/.ipynb_checkpoints/**
+*.npy
+*.npz
+**/.vscode/**
+**/grasp_label*/**
+**/log*/**
+**/dump*/**
+**/build/**
+*.o
+*.so
+*.egg
+**/*.egg-info/*
+graspnetAPI/graspnet-baseline/logs
+graspnetAPI/graspnet-baseline/dataset/tolerance
+

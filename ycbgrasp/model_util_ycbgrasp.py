@@ -8,9 +8,9 @@ sys.path.append(os.path.join(ROOT_DIR, 'utils'))
 
 class ycbgraspDatasetConfig(object):
     def __init__(self):
-        self.num_class = 10
+        self.num_class = 88
         self.num_angle_bin = 12
-        self.num_viewpoint = 36
+        self.num_viewpoint = 300
 
         self.type2class={'007_tuna_fish_can':0, '008_pudding_box':1, '011_banana':2, '024_bowl':3, '025_mug':4,
                         '044_flat_screwdriver':5, '051_large_clamp':6, '055_baseball':7, '061_foam_brick':8, '065-h_cups':9}

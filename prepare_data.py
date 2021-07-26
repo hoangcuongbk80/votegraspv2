@@ -14,6 +14,8 @@ from data_utils import CameraInfo, transform_point_cloud, create_point_cloud_fro
                             get_workspace_mask, remove_invisible_grasp_points
 
 root = "/media/hoang/HD-PZFU3/datasets/graspnet"
+#root = "/graspnet"
+
 display = True
 
 num_points = 50000
@@ -113,7 +115,7 @@ def get_pointcloud(index):
 
 
 def get_grasp_label(index):
-    graspnet_root = '/media/hoang/HD-PZFU3/datasets/graspnet' # ROOT PATH FOR GRASPNET
+    graspnet_root = root # ROOT PATH FOR GRASPNET
     g = GraspNet(graspnet_root, camera='kinect', split='train')
 
     sceneId = int(scenename[index][-4:])
@@ -217,7 +219,6 @@ def extract_data(data_dir, idx_filename, output_folder):
             geometries.append(cloud)
             geometries += sceneGrasp.to_open3d_geometry_list()
             o3d.visualization.draw_geometries(geometries)
-        break
 
 if __name__=='__main__':
         idxs = np.array(range(0,len(depthpath)))
@@ -235,4 +236,4 @@ if __name__=='__main__':
         valid_obj_idxs, grasp_labels = load_grasp_labels(root)
         
         extract_data(DATA_DIR, os.path.join(DATA_DIR, 'train_data_idx.txt'), output_folder = os.path.join(DATA_DIR, 'train'))
-        #extract_ycbgrasp_data(DATA_DIR, os.path.join(DATA_DIR, 'val_data_idx.txt'), output_folder = os.path.join(DATA_DIR, 'val'))
+        extract_data(DATA_DIR, os.path.join(DATA_DIR, 'val_data_idx.txt'), output_folder = os.path.join(DATA_DIR, 'val'))

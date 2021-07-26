@@ -22,7 +22,8 @@ class ycbgraspVotesDataset(Dataset):
         use_color=False, use_height=False, augment=False, scan_idx_list=None):
 
         assert(num_points<=50000)
-        self.data_path = os.path.join(ROOT_DIR, 'ycbgrasp/data/%s'%(split_set))
+        #self.data_path = os.path.join(ROOT_DIR, 'ycbgrasp/data/%s'%(split_set))
+        self.data_path = '/graspnet/data/%s'%(split_set)
 
         self.scan_names = sorted(list(set([os.path.basename(x)[0:6] \
             for x in os.listdir(self.data_path)])))

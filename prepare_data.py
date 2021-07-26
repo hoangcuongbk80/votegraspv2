@@ -17,6 +17,7 @@ root = "/media/hoang/HD-PZFU3/datasets/graspnet"
 #root = "/graspnet"
 
 display = True
+count = 0
 
 num_points = 50000
 num_grasp = 10
@@ -202,7 +203,8 @@ def extract_data(data_dir, idx_filename, output_folder):
         os.mkdir(output_folder)
     
     for data_idx in data_idx_list:
-        print('------------- ', data_idx)
+        count = count + 1
+        print('------------- count: ', count)
         cloud_sampled, color_sampled, seg_sampled = get_pointcloud(data_idx)        
         sceneGrasp = get_grasp_label(data_idx)
         sceneGrasp, point_votes, grasps = compute_votes(sceneGrasp, cloud_sampled, color_sampled, seg_sampled)

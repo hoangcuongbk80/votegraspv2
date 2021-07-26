@@ -54,6 +54,7 @@ from tqdm import tqdm
 import open3d as o3d
 import cv2
 import trimesh
+from scipy.spatial import KDTree
 
 from .grasp import Grasp, GraspGroup, RectGrasp, RectGraspGroup, RECT_GRASP_ARRAY_LEN
 from .utils.utils import transform_points, parse_posevector
@@ -661,6 +662,109 @@ class GraspNet():
             # 'rect'
             rect_grasps = RectGraspGroup(os.path.join(self.root,'scenes','scene_%04d' % sceneId,camera,'rect','%04d.npy' % annId))
             return rect_grasps
+
+    def loadGraspv2(self, sceneId, annId=0, camera='kinect', valid_obj_idxs = None, grasp_labels = None, collision_labels = None, fric_coef_thresh=0.4):
+        '''
+        **Input:**
+
+        - sceneId: int of scene id.
+
+        - annId: int of annotation id.
+
+        - camera: string of camera type, 'kinect' or 'realsense'.
+
+        - grasp_labels: dict of grasp labels. Call self.loadGraspLabels if not given.
+
+        - collision_labels: dict of collision labels. Call self.loadCollisionLabels if not given.
+
+        - fric_coef_thresh: float of the frcition coefficient threshold of the grasp. 
+
+        **ATTENTION**
+
+        the LOWER the friction coefficient is, the better the grasp is.
+
+        **Output:**
+
+        - Return a GraspGroup instance.
+        '''
+
+        import numpy as np
+        from .utils.xmlhandler import xmlReader
+        from .utils.utils import get_obj_pose_list, generate_views, get_model_grasps, transform_points
+        from .utils.rotation import batch_viewpoint_params_to_matrix
+        
+        camera_poses = np.load(os.path.join(self.root,'scenes','scene_%04d' %(sceneId,),camera, 'camera_poses.npy'))
+        camera_pose = camera_poses[annId]
+        scene_reader = xmlReader(os.path.join(self.root,'scenes','scene_%04d' %(sceneId,),camera,'annotations','%04d.xml' %(annId,)))
+        pose_vectors = scene_reader.getposevectorlist()
+
+        obj_list,pose_list = get_obj_pose_list(camera_pose,pose_vectors)
+        print(obj_list)
+        
+
+        collision_dump = collision_labels['scene_'+str(sceneId).zfill(4)]
+
+        num_views, num_angles, num_depths = 300, 12, 4
+        template_views_0 = generate_views(num_views)
+        template_views = template_views_0[np.newaxis, :, np.newaxis, np.newaxis, :]
+        template_views = np.tile(template_views, [1, 1, num_angles, num_depths, 1])
+
+        # grasp = dict()
+        grasp_group = GraspGroup()
+        grasp_group_array = np.zeros((0, 22), dtype=np.float64)
+
+        for i, (obj_idx, trans) in enumerate(zip(obj_list, pose_list)):
+            if obj_idx not in valid_obj_idxs:
+                continue
+            sampled_points, offsets, fric_coefs = grasp_labels[obj_idx]
+            collision = collision_dump[i]
+            point_inds = np.arange(sampled_points.shape[0])
+
+            num_points = len(point_inds)
+            target_points = sampled_points[:, np.newaxis, np.newaxis, np.newaxis, :]
+            target_points = np.tile(target_points, [1, num_views, num_angles, num_depths, 1])
+            views = np.tile(template_views, [num_points, 1, 1, 1, 1])
+            angles = offsets[:, :, :, :, 0]
+            depths = offsets[:, :, :, :, 1]
+            widths = offsets[:, :, :, :, 2]
+
+            mask1 = ((fric_coefs <= fric_coef_thresh) & (fric_coefs > 0) & ~collision)
+            
+            target_points = target_points[mask1]
+            target_points = transform_points(target_points, trans)
+            target_points = transform_points(target_points, np.linalg.inv(camera_pose))
+
+            views = views[mask1]
+            angles = angles[mask1]
+            depths = depths[mask1]
+            widths = widths[mask1]
+            fric_coefs = fric_coefs[mask1]
+
+            views = np.matmul(trans[:3, :3], views.T).T
+            views = np.matmul(np.linalg.inv(camera_pose)[:3, :3], views.T).T
+            tree = KDTree(template_views_0)
+            nearest_dist, view_ind = tree.query(views, k=1)
+            views = template_views_0[view_ind]
+
+            Rs = batch_viewpoint_params_to_matrix(-views, angles)
+            #Rs = np.matmul(trans[np.newaxis, :3, :3], Rs)
+            #Rs = np.matmul(np.linalg.inv(camera_pose)[np.newaxis,:3,:3], Rs)
+
+            num_grasp = widths.shape[0]
+            scores = (1.1 - fric_coefs).reshape(-1,1)
+            widths = widths.reshape(-1,1)
+            view_ind = view_ind.reshape(-1,1)
+            angles = angles.reshape(-1,1)
+            heights = GRASP_HEIGHT * np.ones((num_grasp,1))
+            depths = depths.reshape(-1,1)
+            rotations = Rs.reshape((-1,9))
+            object_ids = obj_idx * np.ones((num_grasp,1), dtype=np.int32)
+
+            obj_grasp_array = np.hstack([scores, widths, heights, depths, rotations, target_points, object_ids, angles, views, view_ind]).astype(np.float32)
+
+            grasp_group_array = np.concatenate((grasp_group_array, obj_grasp_array))
+        grasp_group.grasp_group_array = grasp_group_array
+        return grasp_group
 
     def loadData(self, ids=None, *extargs):
         '''

@@ -13,14 +13,14 @@ sys.path.append(os.path.join(ROOT_DIR, 'utils'))
 from data_utils import CameraInfo, transform_point_cloud, create_point_cloud_from_depth_image,\
                             get_workspace_mask, remove_invisible_grasp_points
 
-#root = "/media/hoang/HD-PZFU3/datasets/graspnet"
-root = "/graspnet"
+root = "/media/hoang/HD-PZFU3/datasets/graspnet"
+#root = "/graspnet"
 
-display = True
-count = 0
+display = False
 
 num_points = 50000
 num_grasp = 10
+
 remove_outlier = True
 valid_obj_idxs = []
 grasp_labels = {}
@@ -202,9 +202,9 @@ def extract_data(data_dir, idx_filename, output_folder):
     if not os.path.exists(output_folder):
         os.mkdir(output_folder)
     
+    mycount = 0
     for data_idx in data_idx_list:
-        count = count + 1
-        print('------------- count: ', count)
+        print(output_folder, ": ",mycount)
         cloud_sampled, color_sampled, seg_sampled = get_pointcloud(data_idx)        
         sceneGrasp = get_grasp_label(data_idx)
         sceneGrasp, point_votes, grasps = compute_votes(sceneGrasp, cloud_sampled, color_sampled, seg_sampled)
@@ -222,20 +222,23 @@ def extract_data(data_dir, idx_filename, output_folder):
             geometries += sceneGrasp.to_open3d_geometry_list()
             o3d.visualization.draw_geometries(geometries)
 
+        mycount = mycount + 1
+        
+
 if __name__=='__main__':
-        idxs = np.array(range(0,len(depthpath)))
-        num_train = (int)(0.75*len(idxs))
-        np.random.seed(0)
-        np.random.shuffle(idxs)
-        
-        DATA_DIR = os.path.join(root, 'data')
-        if not os.path.exists(DATA_DIR):
-            os.mkdir(DATA_DIR)
-        
-        np.savetxt(os.path.join(root, 'data', 'train_data_idx.txt'), idxs[:num_train], fmt='%i')
-        np.savetxt(os.path.join(root, 'data', 'val_data_idx.txt'), idxs[num_train:], fmt='%i')
-        
-        valid_obj_idxs, grasp_labels = load_grasp_labels(root)
-        
-        extract_data(DATA_DIR, os.path.join(DATA_DIR, 'train_data_idx.txt'), output_folder = os.path.join(DATA_DIR, 'train'))
-        extract_data(DATA_DIR, os.path.join(DATA_DIR, 'val_data_idx.txt'), output_folder = os.path.join(DATA_DIR, 'val'))
+    idxs = np.array(range(0,len(depthpath)))
+    num_train = (int)(0.75*len(idxs))
+    np.random.seed(0)
+    np.random.shuffle(idxs)
+    
+    DATA_DIR = os.path.join(root, 'data')
+    if not os.path.exists(DATA_DIR):
+        os.mkdir(DATA_DIR)
+    
+    np.savetxt(os.path.join(root, 'data', 'train_data_idx.txt'), idxs[:num_train], fmt='%i')
+    np.savetxt(os.path.join(root, 'data', 'val_data_idx.txt'), idxs[num_train:], fmt='%i')
+    
+    valid_obj_idxs, grasp_labels = load_grasp_labels(root)
+
+    extract_data(DATA_DIR, os.path.join(DATA_DIR, 'train_data_idx.txt'), output_folder = os.path.join(DATA_DIR, 'train'))
+    extract_data(DATA_DIR, os.path.join(DATA_DIR, 'val_data_idx.txt'), output_folder = os.path.join(DATA_DIR, 'val'))

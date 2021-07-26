@@ -13,8 +13,8 @@ sys.path.append(os.path.join(ROOT_DIR, 'utils'))
 from data_utils import CameraInfo, transform_point_cloud, create_point_cloud_from_depth_image,\
                             get_workspace_mask, remove_invisible_grasp_points
 
-root = "/media/hoang/HD-PZFU3/datasets/graspnet"
-#root = "/graspnet"
+#root = "/media/hoang/HD-PZFU3/datasets/graspnet"
+root = "/graspnet"
 
 display = True
 count = 0

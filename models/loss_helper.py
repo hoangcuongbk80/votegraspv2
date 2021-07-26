@@ -96,8 +96,8 @@ def compute_objectness_loss(end_points):
 
     return objectness_loss, objectness_label, objectness_mask, object_assignment
 
-def compute_grasp_and_sem_cls_loss(end_points, config):
-    """ Compute grasp and semantic classification loss.
+def compute_grasp_loss(end_points, config):
+    """ Compute grasp loss.
 
     Args:
         end_points: dict (read-only)
@@ -107,12 +107,10 @@ def compute_grasp_and_sem_cls_loss(end_points, config):
         angle_cls_loss
         angle_reg_loss
         viewpoint_cls_loss
-        sem_cls_loss
     """
 
     num_angle_bin = config.num_angle_bin
     num_viewpoint = config.num_viewpoint
-    num_class = config.num_class
 
     object_assignment = end_points['object_assignment']
     batch_size = object_assignment.shape[0]
@@ -161,13 +159,7 @@ def compute_grasp_and_sem_cls_loss(end_points, config):
     viewpoint_class_loss = criterion_viewpoint_class(end_points['viewpoint_scores'].transpose(2,1), viewpoint_class_labell) # (B,K)
     viewpoint_class_loss = torch.sum(viewpoint_class_loss * objectness_label)/(torch.sum(objectness_label)+1e-6)
 
-    # 3.4 Semantic cls loss
-    sem_cls_label = torch.gather(end_points['sem_cls_label'], 1, object_assignment) # select (B,K) from (B,K2)
-    criterion_sem_cls = nn.CrossEntropyLoss(reduction='none')
-    sem_cls_loss = criterion_sem_cls(end_points['sem_cls_scores'].transpose(2,1), sem_cls_label) # (B,K)
-    sem_cls_loss = torch.sum(sem_cls_loss * objectness_label)/(torch.sum(objectness_label)+1e-6)
-
-    return center_loss, width_loss, quality_loss, angle_class_loss, angle_residual_normalized_loss, viewpoint_class_loss, sem_cls_loss
+    return center_loss, width_loss, quality_loss, angle_class_loss, angle_residual_normalized_loss, viewpoint_class_loss
 
 def get_loss(end_points, config):
     """ Loss functions
@@ -179,11 +171,9 @@ def get_loss(end_points, config):
                 center,
                 angle_scores, angle_residuals_normalized,
                 viewpoint_scores,
-                sem_cls_scores, #seed_logits,#
                 center_label,
                 angle_class_label, angle_residual_label,
                 viewpoint_class_labell,
-                sem_cls_label,
                 grasp_label_mask,
                 vote_label, vote_label_mask
             }
@@ -210,21 +200,20 @@ def get_loss(end_points, config):
     end_points['neg_ratio'] = \
         torch.sum(objectness_mask.float())/float(total_num_proposal) - end_points['pos_ratio']
 
-    # grasp loss and sem cls loss
-    center_loss, width_loss, quality_loss, angle_cls_loss, angle_reg_loss, viewpoint_cls_loss, sem_cls_loss = \
-        compute_grasp_and_sem_cls_loss(end_points, config)
+    # grasp loss
+    center_loss, width_loss, quality_loss, angle_cls_loss, angle_reg_loss, viewpoint_cls_loss = \
+        compute_grasp_loss(end_points, config)
     end_points['center_loss'] = center_loss
     end_points['width_loss'] = width_loss
     end_points['quality_loss'] = quality_loss
     end_points['angle_cls_loss'] = angle_cls_loss
     end_points['angle_reg_loss'] = angle_reg_loss
     end_points['viewpoint_cls_loss'] = viewpoint_cls_loss
-    end_points['sem_cls_loss'] = sem_cls_loss
     grasp_loss = center_loss + quality_loss + width_loss + 0.1*angle_cls_loss + angle_reg_loss + 0.1*viewpoint_cls_loss
     end_points['grasp_loss'] = grasp_loss
 
     # Final loss function
-    loss = vote_loss + 0.5*objectness_loss + grasp_loss + 0.1*sem_cls_loss
+    loss = vote_loss + 0.5*objectness_loss + grasp_loss
     loss *= 10
     end_points['loss'] = loss
 

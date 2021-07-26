@@ -123,8 +123,7 @@ num_input_channel = int(FLAGS.use_color)*3 + int(not FLAGS.no_height)*1
 
 Detector = MODEL.VoteGrasp
 
-net = Detector(num_class=DATASET_CONFIG.num_class,
-               num_angle_bin=DATASET_CONFIG.num_angle_bin,
+net = Detector(num_angle_bin=DATASET_CONFIG.num_angle_bin,
                num_viewpoint=DATASET_CONFIG.num_viewpoint,
                num_proposal=FLAGS.num_target,
                input_feature_dim=num_input_channel,

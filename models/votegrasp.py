@@ -19,8 +19,6 @@ class VoteGrasp(nn.Module):
 
         Parameters
         ----------
-        num_class: int
-            Number of semantics classes to predict over -- size of softmax classifier
         num_angle_bin: int
         num_viewpoint: int
         input_feature_dim: (default: 0)
@@ -32,11 +30,10 @@ class VoteGrasp(nn.Module):
             Number of votes generated from each seed point.
     """
 
-    def __init__(self, num_class, num_angle_bin, num_viewpoint,
+    def __init__(self, num_angle_bin, num_viewpoint,
         input_feature_dim=0, num_proposal=128, vote_factor=10, sampling='vote_fps'):
         super().__init__()
 
-        self.num_class = num_class
         self.num_angle_bin = num_angle_bin
         self.num_viewpoint = num_viewpoint
         self.input_feature_dim = input_feature_dim
@@ -51,7 +48,7 @@ class VoteGrasp(nn.Module):
         self.vgen = VotingModule(self.vote_factor, 256)
 
         # Vote aggregation and detection
-        self.pnet = ProposalModule(num_class, num_angle_bin, num_viewpoint, num_proposal, sampling)
+        self.pnet = ProposalModule(num_angle_bin, num_viewpoint, num_proposal, sampling)
 
     def forward(self, inputs):
         """ Forward pass of the network

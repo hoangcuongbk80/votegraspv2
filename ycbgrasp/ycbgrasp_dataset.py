@@ -45,7 +45,6 @@ class ycbgraspVotesDataset(Dataset):
             angle_class_label: (MAX_NUM_GRASP,) with int values in 0,...,NUM_ANGLE_BIN-1
             angle_residual_label: (MAX_NUM_GRASP,)
             size_classe_label: (MAX_NUM_GRASP,) with int values in 0,...,NUM_SIZE_CLUSTER
-            sem_cls_label: (MAX_NUM_GRASP,) semantic class index
             grasp_label_mask: (MAX_NUM_GRASP) as 0/1 with 1 indicating a unique grasp
             vote_label: (N,9) with votes XYZ (3 votes: X1Y1Z1, X2Y2Z2, X3Y3Z3)
                 if there is only one vote than X1==X2==X3 etc.
@@ -121,9 +120,6 @@ class ycbgraspVotesDataset(Dataset):
         ret_dict['angle_class_label'] = angle_classes.astype(np.int64)
         ret_dict['angle_residual_label'] = angle_residuals.astype(np.float32)
         ret_dict['viewpoint_class_label'] = viewpoint_classes.astype(np.int64)
-        target_grasps_semcls = np.zeros((MAX_NUM_GRASP))
-        target_grasps_semcls[0:grasps.shape[0]] = grasps[:,-1]
-        ret_dict['sem_cls_label'] = target_grasps_semcls.astype(np.int64)
         ret_dict['grasp_label_mask'] = target_grasps_mask.astype(np.float32)
         
         return ret_dict

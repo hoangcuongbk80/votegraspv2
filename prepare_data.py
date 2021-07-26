@@ -27,7 +27,7 @@ grasp_labels = {}
 camera = 'kinect'
 collision_labels = {}
 
-sceneIds = list( range(100)) #100
+sceneIds = list( range(10)) #100
 sceneIds = ['scene_{}'.format(str(x).zfill(4)) for x in sceneIds]
         
 colorpath = []
@@ -209,9 +209,13 @@ def extract_data(data_dir, idx_filename, output_folder):
         sceneGrasp = get_grasp_label(data_idx)
         sceneGrasp, point_votes, grasps = compute_votes(sceneGrasp, cloud_sampled, color_sampled, seg_sampled)
 
-        np.savez_compressed(os.path.join(output_folder,'%06d_pc.npz'%(data_idx)), pc=cloud_sampled)
-        np.savez_compressed(os.path.join(output_folder, '%06d_votes.npz'%(data_idx)), point_votes = point_votes)
-        np.save(os.path.join(output_folder, '%06d_grasp.npy'%(data_idx)), grasps)
+        sceneId = int(scenename[index][-4:])
+        annId = frameid[index]
+        save_id = sceneId*256 + annId
+
+        np.savez_compressed(os.path.join(output_folder,'%06d_pc.npz'%(save_id)), pc=cloud_sampled)
+        np.savez_compressed(os.path.join(output_folder, '%06d_votes.npz'%(save_id)), point_votes = point_votes)
+        np.save(os.path.join(output_folder, '%06d_grasp.npy'%(save_id)), grasps)
         
         if display:
             geometries = []
@@ -227,7 +231,6 @@ def extract_data(data_dir, idx_filename, output_folder):
 
 if __name__=='__main__':
     idxs = np.array(range(0,len(depthpath)))
-    num_train = (int)(0.75*len(idxs))
     np.random.seed(0)
     np.random.shuffle(idxs)
     
@@ -235,10 +238,8 @@ if __name__=='__main__':
     if not os.path.exists(DATA_DIR):
         os.mkdir(DATA_DIR)
     
-    np.savetxt(os.path.join(root, 'data', 'train_data_idx.txt'), idxs[:num_train], fmt='%i')
-    np.savetxt(os.path.join(root, 'data', 'val_data_idx.txt'), idxs[num_train:], fmt='%i')
+    np.savetxt(os.path.join(root, 'data', 'train_data_idx.txt'), idxs[:], fmt='%i')
     
     valid_obj_idxs, grasp_labels = load_grasp_labels(root)
 
     extract_data(DATA_DIR, os.path.join(DATA_DIR, 'train_data_idx.txt'), output_folder = os.path.join(DATA_DIR, 'train'))
-    extract_data(DATA_DIR, os.path.join(DATA_DIR, 'val_data_idx.txt'), output_folder = os.path.join(DATA_DIR, 'val'))

@@ -14,7 +14,7 @@ import ycbgrasp_utils
 from model_util_ycbgrasp import ycbgraspDatasetConfig
 
 DC = ycbgraspDatasetConfig() # dataset specific config
-MAX_NUM_GRASP = 64
+MAX_NUM_GRASP = 256
 MEAN_COLOR_RGB = np.array([0.5,0.5,0.5])
 
 class ycbgraspVotesDataset(Dataset):

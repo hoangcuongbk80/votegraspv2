@@ -209,8 +209,8 @@ def extract_data(data_dir, idx_filename, output_folder):
         sceneGrasp = get_grasp_label(data_idx)
         sceneGrasp, point_votes, grasps = compute_votes(sceneGrasp, cloud_sampled, color_sampled, seg_sampled)
 
-        sceneId = int(scenename[index][-4:])
-        annId = frameid[index]
+        sceneId = int(scenename[data_idx][-4:])
+        annId = frameid[data_idx]
         save_id = sceneId*256 + annId
 
         np.savez_compressed(os.path.join(output_folder,'%06d_pc.npz'%(save_id)), pc=cloud_sampled)

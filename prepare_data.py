@@ -27,7 +27,7 @@ grasp_labels = {}
 camera = 'kinect'
 collision_labels = {}
 
-sceneIds = list( range(10)) #100
+sceneIds = list( range(10, 20)) #100
 sceneIds = ['scene_{}'.format(str(x).zfill(4)) for x in sceneIds]
         
 colorpath = []
@@ -202,9 +202,7 @@ def extract_data(data_dir, idx_filename, output_folder):
     if not os.path.exists(output_folder):
         os.mkdir(output_folder)
     
-    mycount = 0
     for data_idx in data_idx_list:
-        print(output_folder, ": ",mycount)
         cloud_sampled, color_sampled, seg_sampled = get_pointcloud(data_idx)        
         sceneGrasp = get_grasp_label(data_idx)
         sceneGrasp, point_votes, grasps = compute_votes(sceneGrasp, cloud_sampled, color_sampled, seg_sampled)
@@ -212,6 +210,8 @@ def extract_data(data_dir, idx_filename, output_folder):
         sceneId = int(scenename[data_idx][-4:])
         annId = frameid[data_idx]
         save_id = sceneId*256 + annId
+
+        print("save_id: ", save_id)
 
         np.savez_compressed(os.path.join(output_folder,'%06d_pc.npz'%(save_id)), pc=cloud_sampled)
         np.savez_compressed(os.path.join(output_folder, '%06d_votes.npz'%(save_id)), point_votes = point_votes)
@@ -225,9 +225,6 @@ def extract_data(data_dir, idx_filename, output_folder):
             geometries.append(cloud)
             geometries += sceneGrasp.to_open3d_geometry_list()
             o3d.visualization.draw_geometries(geometries)
-
-        mycount = mycount + 1
-        
 
 if __name__=='__main__':
     idxs = np.array(range(0,len(depthpath)))

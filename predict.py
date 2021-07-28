@@ -41,7 +41,7 @@ if __name__=='__main__':
     log_dir = os.path.join(BASE_DIR, 'log') 
 
     sys.path.append(os.path.join(ROOT_DIR, 'dataset'))
-    from dataset import DC # dataset config
+    from votegrasp_dataset import DC # dataset config
     checkpoint_path = os.path.join(log_dir, 'checkpoint.tar') # trained model path
     pc_path = FLAGS.input
 

@@ -201,7 +201,7 @@ def extract_data(data_dir, idx_filename, output_folder):
     data_idx_list = [int(line.rstrip()) for line in open(idx_filename)]
     if not os.path.exists(output_folder):
         os.mkdir(output_folder)
-    
+    count = 0
     for data_idx in data_idx_list:
         cloud_sampled, color_sampled, seg_sampled = get_pointcloud(data_idx)        
         sceneGrasp = get_grasp_label(data_idx)
@@ -211,7 +211,7 @@ def extract_data(data_dir, idx_filename, output_folder):
         annId = frameid[data_idx]
         save_id = sceneId*256 + annId
 
-        print("save_id: ", save_id)
+        print("count: ", count)
 
         np.savez_compressed(os.path.join(output_folder,'%06d_pc.npz'%(save_id)), pc=cloud_sampled)
         np.savez_compressed(os.path.join(output_folder, '%06d_votes.npz'%(save_id)), point_votes = point_votes)
@@ -225,6 +225,8 @@ def extract_data(data_dir, idx_filename, output_folder):
             geometries.append(cloud)
             geometries += sceneGrasp.to_open3d_geometry_list()
             o3d.visualization.draw_geometries(geometries)
+
+        count = count+1
 
 if __name__=='__main__':
     idxs = np.array(range(0,len(depthpath)))

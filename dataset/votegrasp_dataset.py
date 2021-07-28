@@ -9,7 +9,7 @@ sys.path.append(BASE_DIR)
 sys.path.append(os.path.join(ROOT_DIR, 'utils'))
 import pc_util
 import votegrasp_utils
-from model_util_votegrasp import datasetConfig
+from model_util import datasetConfig
 
 DC = datasetConfig() # dataset specific config
 MAX_NUM_GRASP = 256

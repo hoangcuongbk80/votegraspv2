@@ -15,7 +15,7 @@ DC = datasetConfig() # dataset specific config
 MAX_NUM_GRASP = 256
 MEAN_COLOR_RGB = np.array([0.5,0.5,0.5])
 
-class votegrasp_dataset(Dataset):
+class votegraspDataset(Dataset):
     def __init__(self, split_set='train', num_points=20000,
         use_color=False, use_height=False, augment=False, scan_idx_list=None):
 

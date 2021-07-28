@@ -95,10 +95,10 @@ def my_worker_init_fn(worker_id):
 
 # Create Dataset and Dataloader
 sys.path.append(os.path.join(ROOT_DIR, 'dataset'))
-from dataset import votegrasp_dataset
+from votegrasp_dataset import votegraspDataset
 from model_util import datasetConfig
 DATASET_CONFIG = datasetConfig()
-TRAIN_DATASET = votegrasp_dataset('train', num_points=NUM_POINT, augment=False,
+TRAIN_DATASET = votegraspDataset('train', num_points=NUM_POINT, augment=False,
                 use_color=FLAGS.use_color, use_height=(not FLAGS.no_height))
 
 TRAIN_DATALOADER = DataLoader(TRAIN_DATASET, batch_size=BATCH_SIZE,

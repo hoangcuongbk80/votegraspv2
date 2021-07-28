@@ -95,7 +95,7 @@ def my_worker_init_fn(worker_id):
 
 # Create Dataset and Dataloader
 sys.path.append(os.path.join(ROOT_DIR, 'dataset'))
-from dataset import votegrasp_dataset, MAX_NUM_GRASP
+from dataset import votegrasp_dataset
 from model_util_dataset import datasetConfig
 DATASET_CONFIG = datasetConfig()
 TRAIN_DATASET = datasetVotesDataset('train', num_points=NUM_POINT,

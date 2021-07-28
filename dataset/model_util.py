@@ -11,13 +11,6 @@ class datasetConfig(object):
         self.num_class = 88
         self.num_angle_bin = 12
         self.num_viewpoint = 300
-
-        self.type2class={'007_tuna_fish_can':0, '008_pudding_box':1, '011_banana':2, '024_bowl':3, '025_mug':4,
-                        '044_flat_screwdriver':5, '051_large_clamp':6, '055_baseball':7, '061_foam_brick':8, '065-h_cups':9}
-        self.class2type = {self.type2class[t]:t for t in self.type2class}
-        self.type2onehotclass={'007_tuna_fish_can':0, '008_pudding_box':1, '011_banana':2, '024_bowl':3, '025_mug':4,
-                            '044_flat_screwdriver':5, '051_large_clamp':6, '055_baseball':7, '061_foam_brick':8, '065-h_cups':9}
-
     
     def angle2class(self, angle):
         ''' Convert continuous angle to discrete class

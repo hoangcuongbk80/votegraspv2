@@ -98,9 +98,8 @@ sys.path.append(os.path.join(ROOT_DIR, 'dataset'))
 from dataset import votegrasp_dataset
 from model_util import datasetConfig
 DATASET_CONFIG = datasetConfig()
-TRAIN_DATASET = datasetVotesDataset('train', num_points=NUM_POINT,
-        augment=False,
-        use_color=FLAGS.use_color, use_height=(not FLAGS.no_height))
+TRAIN_DATASET = votegrasp_Dataset('train', num_points=NUM_POINT, augment=False,
+                use_color=FLAGS.use_color, use_height=(not FLAGS.no_height))
 
 TRAIN_DATALOADER = DataLoader(TRAIN_DATASET, batch_size=BATCH_SIZE,
     shuffle=True, num_workers=4, worker_init_fn=my_worker_init_fn)

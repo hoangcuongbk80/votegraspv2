@@ -38,7 +38,6 @@ def dump_results(end_points, dump_dir, config, inference_switch=False):
     pred_angle_class = pred_angle_class.detach().cpu().numpy() # B,num_proposal
     pred_angle_residual = pred_angle_residual.squeeze(2).detach().cpu().numpy() # B,num_proposal
     pred_viewpoint_class = torch.argmax(end_points['viewpoint_scores'], -1) # B,num_proposal
-    pred_sem_cls = torch.argmax(end_points['sem_cls_scores'], -1) # B,num_proposal
 
     pred_quality = end_points['quality'].detach().cpu().numpy() # B,num_proposal
     pred_width = end_points['width'].detach().cpu().numpy() # B,num_proposal
@@ -69,7 +68,7 @@ def dump_results(end_points, dump_dir, config, inference_switch=False):
         if np.sum(objectness_prob>DUMP_CONF_THRESH)>0:
             num_proposal = pred_center.shape[1]
             for j in range(num_proposal):
-                grasp = config.param2grasp(pred_sem_cls[i,j], pred_center[i,j,0:3], pred_viewpoint_class[i,j],
+                grasp = config.param2grasp(pred_center[i,j,0:3], pred_viewpoint_class[i,j],
                             pred_angle_class[i,j], pred_angle_residual[i,j], pred_quality[i,j,0], pred_width[i,j,0])
                 f.write(grasp[0])
                 f.write(' ')             

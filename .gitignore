@@ -1,8 +1,8 @@
 # Data files and directories common
-ycbgrasp/data/
-ycbgrasp/data_viz_dump
+dataset/data/
+votegrasp/data_viz_dump
 demo_files/
-log_ycbgrasp/
+log_votegrasp/
 log/
 pred_result/
 pointnet2/build/

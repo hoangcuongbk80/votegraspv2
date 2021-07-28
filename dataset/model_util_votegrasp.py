@@ -6,7 +6,7 @@ sys.path.append(BASE_DIR)
 ROOT_DIR = os.path.dirname(BASE_DIR)
 sys.path.append(os.path.join(ROOT_DIR, 'utils'))
 
-class ycbgraspDatasetConfig(object):
+class datasetConfig(object):
     def __init__(self):
         self.num_class = 88
         self.num_angle_bin = 12
@@ -47,9 +47,9 @@ class ycbgraspDatasetConfig(object):
             angle = angle - 2*np.pi
         return angle
 
-    def param2grasp(self, sem_cls, center, viewpoint_class, angle_class, angle_residual, quality, width):
+    def param2grasp(self, center, viewpoint_class, angle_class, angle_residual, quality, width):
         angle = self.class2angle(angle_class, angle_residual) * 180/np.pi
-        object_name = self.class2type[int(sem_cls)]
+        object_name = 0
         grasp = []
         grasp.append(object_name)
         grasp.append(center[0])

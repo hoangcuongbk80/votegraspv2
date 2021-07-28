@@ -1,7 +1,7 @@
-""" Training for grasp detection with YCB objects.
+""" Training for grasp detection.
 
 Sample usage:
-python grasp_train.py --dataset ycbgrasp --log_dir log_ycbgrasp
+python grasp_train.py --dataset dataset --log_dir log_dataset
 
 """
 
@@ -28,7 +28,6 @@ from tf_visualizer import Visualizer as TfVisualizer
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--model', default='votegrasp', help='Model file name [default: votegrasp]')
-parser.add_argument('--dataset', default='ycbgrasp', help='Dataset name. ycbgrasp. [default: ycbgrasp]')
 parser.add_argument('--checkpoint_path', default=None, help='Model checkpoint path [default: None]')
 parser.add_argument('--log_dir', default='log', help='Dump dir to save model checkpoint [default: log]')
 parser.add_argument('--dump_dir', default=None, help='Dump dir to save sample outputs [default: None]')
@@ -95,17 +94,14 @@ def my_worker_init_fn(worker_id):
     np.random.seed(np.random.get_state()[1][0] + worker_id)
 
 # Create Dataset and Dataloader
-if FLAGS.dataset == 'ycbgrasp':
-    sys.path.append(os.path.join(ROOT_DIR, 'ycbgrasp'))
-    from ycbgrasp_dataset import ycbgraspVotesDataset, MAX_NUM_GRASP
-    from model_util_ycbgrasp import ycbgraspDatasetConfig
-    DATASET_CONFIG = ycbgraspDatasetConfig()
-    TRAIN_DATASET = ycbgraspVotesDataset('train', num_points=NUM_POINT,
+sys.path.append(os.path.join(ROOT_DIR, 'dataset'))
+from dataset import votegrasp_Dataset, MAX_NUM_GRASP
+from model_util_dataset import datasetConfig
+DATASET_CONFIG = datasetConfig()
+TRAIN_DATASET = datasetVotesDataset('train', num_points=NUM_POINT,
         augment=False,
         use_color=FLAGS.use_color, use_height=(not FLAGS.no_height))
-else:
-    print('Unknown dataset %s. Exiting...'%(FLAGS.dataset))
-    exit(-1)
+
 TRAIN_DATALOADER = DataLoader(TRAIN_DATASET, batch_size=BATCH_SIZE,
     shuffle=True, num_workers=4, worker_init_fn=my_worker_init_fn)
 

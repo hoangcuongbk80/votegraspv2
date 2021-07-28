@@ -26,7 +26,7 @@ python setup.py install
 
 
 ------------------------------VoteGrasp-------------------------------
-python train.py --dataset ycbgrasp --log_dir log_ycbgrasp
+python train.py --log_dir log_votegrasp
 python predict.py
 
 ------------------------------graspnet-baseline-------------------------------

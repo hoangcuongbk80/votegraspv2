@@ -1,5 +1,3 @@
-""" Dataset for grasping on YCB objects. """
-
 import os
 import sys
 import numpy as np
@@ -10,19 +8,19 @@ ROOT_DIR = os.path.dirname(BASE_DIR)
 sys.path.append(BASE_DIR)
 sys.path.append(os.path.join(ROOT_DIR, 'utils'))
 import pc_util
-import ycbgrasp_utils
-from model_util_ycbgrasp import ycbgraspDatasetConfig
+import votegrasp_utils
+from model_util_votegrasp import datasetConfig
 
-DC = ycbgraspDatasetConfig() # dataset specific config
+DC = datasetConfig() # dataset specific config
 MAX_NUM_GRASP = 256
 MEAN_COLOR_RGB = np.array([0.5,0.5,0.5])
 
-class ycbgraspVotesDataset(Dataset):
+class votegrasp_Dataset(Dataset):
     def __init__(self, split_set='train', num_points=20000,
         use_color=False, use_height=False, augment=False, scan_idx_list=None):
 
         assert(num_points<=50000)
-        #self.data_path = os.path.join(ROOT_DIR, 'ycbgrasp/data/%s'%(split_set))
+        #self.data_path = os.path.join(ROOT_DIR, 'votegrasp/data/%s'%(split_set))
         self.data_path = '/graspnet/data1/%s'%(split_set)
 
         self.scan_names = sorted(list(set([os.path.basename(x)[0:6] \

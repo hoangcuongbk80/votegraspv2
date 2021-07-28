@@ -9,7 +9,7 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(BASE_DIR)
 sys.path.append(os.path.join(BASE_DIR, '../utils/'))
 import pc_util
-import ycbgrasp_utils
+import votegrasp_utils
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--viz', action='store_true', help='Run data visualization.')
@@ -38,15 +38,15 @@ class ycb_object(object):
     def get_pointcloud(self, idx):
         pc_filename = os.path.join(self.pointcloud_dir, '%d.ply'%(idx))
         print(pc_filename)
-        return ycbgrasp_utils.load_pointcloud(pc_filename)
+        return votegrasp_utils.load_pointcloud(pc_filename)
 
     def get_label_objects(self, idx): 
         grasp_filename = os.path.join(self.grasp_dir, '%d.txt'%(idx))
         print(grasp_filename)
-        return ycbgrasp_utils.load_label(grasp_filename, self.num_grasps)
+        return votegrasp_utils.load_label(grasp_filename, self.num_grasps)
 
 def data_viz(data_dir, dump_dir=os.path.join(BASE_DIR, 'data_viz_dump')):
-    ''' Examine and visualize ycbgrasp dataset. '''
+    ''' Examine and visualize votegrasp dataset. '''
     ycb = ycb_object(data_dir)
     idxs = np.array(range(0,len(ycb)))
 
@@ -65,7 +65,7 @@ def data_viz(data_dir, dump_dir=os.path.join(BASE_DIR, 'data_viz_dump')):
         
     print('Complete!')
     
-def extract_ycbgrasp_data(data_dir, idx_filename, output_folder, num_point=20000,
+def extract_votegrasp_data(data_dir, idx_filename, output_folder, num_point=20000,
     type_whitelist=DEFAULT_TYPE_WHITELIST):
     
     dataset = ycb_object(data_dir)
@@ -88,7 +88,7 @@ def extract_ycbgrasp_data(data_dir, idx_filename, output_folder, num_point=20000
         point_vote_idx = np.zeros((N)).astype(np.int32) # in the range of [0,2]
         indices = np.arange(N)
         for obj in objects:
-            object_pc, inds=ycbgrasp_utils.get_object_points(pc, obj.classname)
+            object_pc, inds=votegrasp_utils.get_object_points(pc, obj.classname)
             
             if len(object_pc) < 300:
                 continue
@@ -100,7 +100,7 @@ def extract_ycbgrasp_data(data_dir, idx_filename, output_folder, num_point=20000
                 grasp[4] = grp[4] # angle
                 grasp[5] = grp[5] # quality
                 grasp[5] = grp[6] # width
-                grasp[7] = ycbgrasp_utils.type2class[obj.classname] # semantic class id
+                grasp[7] = votegrasp_utils.type2class[obj.classname] # semantic class id
                 grasp_list.append(grasp)
             
             # Assign first dimension to indicate it belongs an object
@@ -138,7 +138,7 @@ if __name__=='__main__':
         np.savetxt(os.path.join(BASE_DIR, 'data', 'val_data_idx.txt'), idxs[15000:], fmt='%i')
         
         DATA_DIR = os.path.join(BASE_DIR, 'data')
-        extract_ycbgrasp_data(DATA_DIR, os.path.join(DATA_DIR, 'train_data_idx.txt'),
+        extract_votegrasp_data(DATA_DIR, os.path.join(DATA_DIR, 'train_data_idx.txt'),
             output_folder = os.path.join(DATA_DIR, 'train'), num_point=50000)
-        extract_ycbgrasp_data(DATA_DIR, os.path.join(DATA_DIR, 'val_data_idx.txt'),
+        extract_votegrasp_data(DATA_DIR, os.path.join(DATA_DIR, 'val_data_idx.txt'),
             output_folder = os.path.join(DATA_DIR, 'val'), num_point=50000)

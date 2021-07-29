@@ -211,9 +211,7 @@ def extract_data(data_dir, idx_filename, output_folder):
 
     count = len(exist_idx_list)
     for data_idx in data_idx_list:
-        cloud_sampled, color_sampled, seg_sampled = get_pointcloud(data_idx)        
-        sceneGrasp = get_grasp_label(data_idx)
-        sceneGrasp, point_votes, grasps = compute_votes(sceneGrasp, cloud_sampled, color_sampled, seg_sampled)
+        print("---------now---------: ", count)
 
         sceneId = int(scenename[data_idx][-4:])
         annId = frameid[data_idx]
@@ -221,8 +219,11 @@ def extract_data(data_dir, idx_filename, output_folder):
         if save_id in exist_idx_list:
             print("The id already exist: ", save_id)
             continue
-
-        print("count: ", count)
+        
+        cloud_sampled, color_sampled, seg_sampled = get_pointcloud(data_idx)        
+        sceneGrasp = get_grasp_label(data_idx)
+        sceneGrasp, point_votes, grasps = compute_votes(sceneGrasp, cloud_sampled, color_sampled, seg_sampled)
+        
 
         np.savez_compressed(os.path.join(output_folder,'%06d_pc.npz'%(save_id)), pc=cloud_sampled)
         np.savez_compressed(os.path.join(output_folder, '%06d_votes.npz'%(save_id)), point_votes = point_votes)

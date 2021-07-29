@@ -13,8 +13,8 @@ sys.path.append(os.path.join(ROOT_DIR, 'utils'))
 from data_utils import CameraInfo, transform_point_cloud, create_point_cloud_from_depth_image,\
                             get_workspace_mask, remove_invisible_grasp_points
 
-#root = "/media/hoang/HD-PZFU3/datasets/graspnet"
-root = "/graspnet"
+root = "/media/hoang/HD-PZFU3/datasets/graspnet"
+#root = "/graspnet"
 
 display = False
 
@@ -201,7 +201,15 @@ def extract_data(data_dir, idx_filename, output_folder):
     data_idx_list = [int(line.rstrip()) for line in open(idx_filename)]
     if not os.path.exists(output_folder):
         os.mkdir(output_folder)
-    count = 0
+    
+    exist_idx_list = []
+    for exist_file in os.listdir(output_folder):
+        if exist_file.endswith("_grasp.npy"):
+            now_id = int(exist_file[-16:-10])
+            exist_idx_list.append(now_id)
+    print("Exist files: ", len(exist_idx_list))
+
+    count = len(exist_idx_list)
     for data_idx in data_idx_list:
         cloud_sampled, color_sampled, seg_sampled = get_pointcloud(data_idx)        
         sceneGrasp = get_grasp_label(data_idx)
@@ -210,6 +218,9 @@ def extract_data(data_dir, idx_filename, output_folder):
         sceneId = int(scenename[data_idx][-4:])
         annId = frameid[data_idx]
         save_id = sceneId*256 + annId
+        if save_id in exist_idx_list:
+            print("The id already exist: ", save_id)
+            continue
 
         print("count: ", count)
 

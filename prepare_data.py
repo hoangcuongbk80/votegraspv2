@@ -27,7 +27,7 @@ grasp_labels = {}
 camera = 'kinect'
 collision_labels = {}
 
-sceneIds = list( range(20, 40)) #100
+sceneIds = list( range(40, 60)) #100
 sceneIds = ['scene_{}'.format(str(x).zfill(4)) for x in sceneIds]
         
 colorpath = []

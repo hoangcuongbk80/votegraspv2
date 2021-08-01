@@ -16,6 +16,33 @@ def softmax(x):
     probs /= np.sum(probs, axis=len(shape)-1, keepdims=True)
     return probs
 
+def generate_views(N, phi=(np.sqrt(5)-1)/2, center=np.zeros(3, dtype=np.float32), R=1):
+    ''' Author: chenxi-wang
+    View sampling on a sphere using Febonacci lattices.
+
+    **Input:**
+
+    - N: int, number of viewpoints.
+
+    - phi: float, constant angle to sample views, usually 0.618.
+
+    - center: numpy array of (3,), sphere center.
+
+    - R: float, sphere radius.
+
+    **Output:**
+
+    - numpy array of (N, 3), coordinates of viewpoints.
+    '''
+    idxs = np.arange(N, dtype=np.float32)
+    Z = (2 * idxs + 1) / N - 1
+    X = np.sqrt(1 - Z**2) * np.cos(2 * idxs * np.pi * phi)
+    Y = np.sqrt(1 - Z**2) * np.sin(2 * idxs * np.pi * phi)
+    views = np.stack([X,Y,Z], axis=1)
+    views = R * np.array(views) + center
+    return views
+
+
 def batch_viewpoint_params_to_matrix(batch_towards, batch_angle):
     '''
     **Input:**
@@ -45,6 +72,7 @@ def batch_viewpoint_params_to_matrix(batch_towards, batch_angle):
     matrix = np.matmul(R2, R1)
     return matrix.astype(np.float32)
 
+
 def dump_results(end_points, dump_dir, config, inference_switch=False):
 
     if not os.path.exists(dump_dir):
@@ -55,26 +83,36 @@ def dump_results(end_points, dump_dir, config, inference_switch=False):
     batch_size = point_clouds.shape[0]
 
     # NETWORK OUTPUTS
+    
+    pred_angle_class = torch.argmax(end_points['angle_scores'], -1) # B,num_proposal
+    pred_angle_residual = torch.gather(end_points['angle_residuals'], 2, pred_angle_class.unsqueeze(-1)) # B,num_proposal,1
+    pred_viewpoint_class = torch.argmax(end_points['viewpoint_scores'], -1) # B,num_proposal
+
     seed_xyz = end_points['seed_xyz'].detach().cpu().numpy() # (B,num_seed,3)
     if 'vote_xyz' in end_points:
         aggregated_vote_xyz = end_points['aggregated_vote_xyz'].detach().cpu().numpy()
         vote_xyz = end_points['vote_xyz'].detach().cpu().numpy() # (B,num_seed,3)
         aggregated_vote_xyz = end_points['aggregated_vote_xyz'].detach().cpu().numpy()
-    objectness_scores = end_points['objectness_scores'].detach().cpu().numpy() # (B,K,2)
-    pred_center = end_points['center'].detach().cpu().numpy() # (B,K,3)
-    pred_angle_class = torch.argmax(end_points['angle_scores'], -1) # B,num_proposal
-    pred_angle_residual = torch.gather(end_points['angle_residuals'], 2, pred_angle_class.unsqueeze(-1)) # B,num_proposal,1
     pred_angle_class = pred_angle_class.detach().cpu().numpy() # B,num_proposal
+    pred_viewpoint_class = pred_viewpoint_class.detach().cpu().numpy() # B,num_proposal
     pred_angle_residual = pred_angle_residual.squeeze(2).detach().cpu().numpy() # B,num_proposal
-    pred_viewpoint_class = torch.argmax(end_points['viewpoint_scores'], -1) # B,num_proposal
-
+    pred_center = end_points['center'].detach().cpu().numpy() # (B,K,3)
+    objectness_scores = end_points['objectness_scores'].detach().cpu().numpy() # (B,K,2)
     pred_quality = end_points['quality'].detach().cpu().numpy() # B,num_proposal
     pred_width = end_points['width'].detach().cpu().numpy() # B,num_proposal
 
     print("pred_angle_class: ", pred_angle_class)
     print("pred_viewpoint_class: ", pred_viewpoint_class)
 
+    num_views, num_angles = 300, 12
+    template_views = generate_views(num_views)
+    views = np.zeros([300, pred_viewpoint_class.shape[0]])
+    for i in range(0,pred_viewpoint_class.shape[0]):
+        if pred_viewpoint_class[i] < 0 or pred_viewpoint_class[i] > 300:
+            continue
+        views[i] = template_views[pred_viewpoint_class[i]] 
     batch_viewpoint_params_to_matrix(pred_angle_class, pred_viewpoint_class)
+
 
     # OTHERS
     #pred_mask = end_points['pred_mask'] # B,num_proposal

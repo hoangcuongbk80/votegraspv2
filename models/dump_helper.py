@@ -134,9 +134,9 @@ def dump_results(end_points, dump_dir, config, inference_switch=False):
             views[j] = template_views[pred_viewpoint_class[i,j]] 
 
         print("pred_angle_class: ", pred_angle_class[i,:])
-        print("pred_viewpoint_class: ", pred_viewpoint_class[i,:])
+        print("-views: ", -views)
 
-        batch_viewpoint_params_to_matrix(pred_angle_class[i,:], -views)
+        batch_viewpoint_params_to_matrix(-views, pred_angle_class[i,:])
 
 
         # Dump predicted grasps

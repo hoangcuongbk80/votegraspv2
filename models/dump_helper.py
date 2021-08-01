@@ -106,13 +106,6 @@ def dump_results(end_points, dump_dir, config, inference_switch=False):
 
     num_views, num_angles = 300, 12
     template_views = generate_views(num_views)
-    views = np.zeros([300, pred_viewpoint_class.shape[0]])
-    for i in range(0,pred_viewpoint_class.shape[0]):
-        if pred_viewpoint_class[i] < 0 or pred_viewpoint_class[i] > 300:
-            continue
-        views[i] = template_views[pred_viewpoint_class[i]] 
-    batch_viewpoint_params_to_matrix(pred_angle_class, pred_viewpoint_class)
-
 
     # OTHERS
     #pred_mask = end_points['pred_mask'] # B,num_proposal
@@ -136,6 +129,13 @@ def dump_results(end_points, dump_dir, config, inference_switch=False):
         if np.sum(objectness_prob>DUMP_CONF_THRESH)>0:
             pc_util.write_ply(pred_center[i,objectness_prob>DUMP_CONF_THRESH,0:3], os.path.join(dump_dir, '%06d_confident_proposal_pc.ply'%(idx_beg+i)))
 
+
+        views = np.zeros([300, pred_viewpoint_class.shape[0]])
+        for j in range(0,pred_viewpoint_class.shape[0]):
+            if pred_viewpoint_class[i,j] < 0 or pred_viewpoint_class[i,j] > 300:
+                continue
+            views[j] = template_views[pred_viewpoint_class[i,j]] 
+        batch_viewpoint_params_to_matrix(pred_angle_class[i,:], pred_viewpoint_class[i,:])
 
 
         # Dump predicted grasps

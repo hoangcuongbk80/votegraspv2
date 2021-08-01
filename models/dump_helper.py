@@ -101,9 +101,6 @@ def dump_results(end_points, dump_dir, config, inference_switch=False):
     pred_quality = end_points['quality'].detach().cpu().numpy() # B,num_proposal
     pred_width = end_points['width'].detach().cpu().numpy() # B,num_proposal
 
-    print("pred_angle_class: ", pred_angle_class)
-    print("pred_viewpoint_class: ", pred_viewpoint_class)
-
     num_views, num_angles = 300, 12
     template_views = generate_views(num_views)
 
@@ -135,6 +132,10 @@ def dump_results(end_points, dump_dir, config, inference_switch=False):
             if pred_viewpoint_class[i,j] < 0 or pred_viewpoint_class[i,j] > 300:
                 continue
             views[j] = template_views[pred_viewpoint_class[i,j]] 
+
+        print("pred_angle_class: ", pred_angle_class[i,:])
+        print("pred_viewpoint_class: ", pred_viewpoint_class[i,:])
+
         batch_viewpoint_params_to_matrix(pred_angle_class[i,:], pred_viewpoint_class[i,:])
 
 

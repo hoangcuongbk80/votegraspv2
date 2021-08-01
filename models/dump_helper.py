@@ -130,7 +130,7 @@ def dump_results(end_points, dump_dir, config, inference_switch=False):
             pc_util.write_ply(pred_center[i,objectness_prob>DUMP_CONF_THRESH,0:3], os.path.join(dump_dir, '%06d_confident_proposal_pc.ply'%(idx_beg+i)))
 
 
-        views = np.zeros([300, pred_viewpoint_class.shape[0]])
+        views = np.zeros([pred_viewpoint_class.shape[0], 3])
         for j in range(0,pred_viewpoint_class.shape[0]):
             if pred_viewpoint_class[i,j] < 0 or pred_viewpoint_class[i,j] > 300:
                 continue

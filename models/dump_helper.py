@@ -128,13 +128,13 @@ def dump_results(end_points, dump_dir, config, inference_switch=False):
 
 
         views = np.zeros([pred_viewpoint_class.shape[1], 3])
-        for j in range(0,pred_viewpoint_class.shape[0]):
+        for j in range(0,pred_viewpoint_class.shape[1]):
             if pred_viewpoint_class[i,j] < 0 or pred_viewpoint_class[i,j] > 300:
                 continue
             views[j] = template_views[pred_viewpoint_class[i,j]] 
 
         print("pred_angle_class: ", pred_angle_class[i,:])
-        print("-views: ", -views)
+        print("views: ", views)
 
         batch_viewpoint_params_to_matrix(-views, pred_angle_class[i,:])
 
